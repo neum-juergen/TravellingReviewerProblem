@@ -71,25 +71,39 @@ namespace YelpAcademicSet
             {
                 var newBiz = new AggregatedBusiness(biz);
                 newBiz.Date = d.ToString("yyyy-MM-dd");
-                
 
+                var reviewsInMonth = 0;
+                var foreignInMonth = 0;
+                var homeInMonth = 0;
+                var sumInMonth = 0.0;
                 
                 while (date <= d & c<biz.Revs.Count)
                 {
                     observations = true;
                     cumSum += Convert.ToDouble(biz.Revs[c].Stars);
-                    cumHome += biz.Revs[c].IsInHome;
-                    cumForeign += 1-biz.Revs[c].IsInHome;
+                    cumHome += biz.Revs[c].IsInHomeArea;
+                    cumForeign += 1-biz.Revs[c].IsInHomeArea;
                     cumReviews++;
+                    sumInMonth += Convert.ToDouble(biz.Revs[c].Stars);
+                    homeInMonth += biz.Revs[c].IsInHomeArea;
+                    foreignInMonth = 1 - biz.Revs[c].IsInHomeArea;
+                    reviewsInMonth++;
                     c++;
                     if(c<biz.Revs.Count)
                         date = DateTime.Parse(biz.Revs[c].Date);
                 }
-                newBiz.ObservedAvg = cumSum / cumReviews;
+                if(cumReviews>0)
+                    newBiz.ObservedAvg = cumSum / cumReviews;
                 newBiz.ReviewsHome = cumHome;
                 newBiz.ReviewsForeign = cumForeign;
                 newBiz.ReviewsObserved = cumReviews;
-                d = d.AddYears(1);
+                newBiz.ReviewsInMonth = reviewsInMonth;
+                if(reviewsInMonth>0)
+                    newBiz.AvgInMonth = sumInMonth / reviewsInMonth;
+                if (newBiz.AvgInMonth > 5) throw new Exception();
+                newBiz.ForeignInMonth = foreignInMonth;
+                newBiz.HomeInMonth = homeInMonth;
+                d = d.AddMonths(1);
                 if (observations)
                 {
                     result.Add(newBiz);
@@ -131,5 +145,13 @@ namespace YelpAcademicSet
             
             return newBiz;
         }
+
+        public int ReviewsInMonth { get; set; }
+
+        public double AvgInMonth { get; set; }
+
+        public int ForeignInMonth { get; set; }
+
+        public int HomeInMonth { get; set; }
     }
 }
