@@ -14,6 +14,7 @@ namespace YelpAcademicSet
         public User User { get; set; }
         public int IsInHome { get; set; }
         public int Travelled { get; set; }
+        public string Text { get; set; }
 
         public int Funny { get; set; }
         public int Useful { get; set; }
@@ -34,7 +35,6 @@ namespace YelpAcademicSet
         public int CumulatedUserReviewCount { get; set; }
 
         public int FirstTimeReview { get; set; }
-        public string Text { get; set; }
         public double CumulatedUserHomeAvg { get; set; }
         public double CumulatedUserForeignAvg { get; set; }
         public int CumulatedUserHomeCount { get; set; }
