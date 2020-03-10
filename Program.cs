@@ -19,9 +19,12 @@ namespace YelpAcademicSet
 
         static void Main(string[] args)
         {
-
-
-            determineBusiness();
+            
+            //basic_main();
+             writeRevTextsForSelectedUsers();
+            //basicForSelectedUsers();
+           // writeJsonForUsRestaurants();
+           // readFile("C:\\usrestaurantreviews.json", _replace);
         }
 
         static int reviewId = 0;
@@ -52,7 +55,7 @@ namespace YelpAcademicSet
 
         private static void fillCityMap()
         {
-            System.IO.StreamReader file =new System.IO.StreamReader(@"C: \Users\Jürgen Neumann\Desktop\Yelp Round 11\dataset\zip_list.csv");
+            System.IO.StreamReader file =new System.IO.StreamReader(@"C:\zip_list.csv");
             var line = file.ReadLine();
             while ((line = file.ReadLine()) != null)
             {
@@ -75,7 +78,7 @@ namespace YelpAcademicSet
         private static int user_max_friends = 0;
         private static int user_max_elite = 0;
         private static int business_max_cats = 0;
-        private static void _handleUser(string line)
+        private static void _handleUser(string line, bool end)
         {
             dynamic stuff = JsonConvert.DeserializeObject(line);
             if (stuff!=null)
@@ -116,7 +119,7 @@ namespace YelpAcademicSet
                     _users[stuff.user_id.ToString()].YearsElite.Add(s);
                // foreach (string s in stuff.friends)
                  //   _users[stuff.user_id.ToString()].Friends.Add(s);
-                Console.WriteLine("Users:" + _users.Keys.Count);
+                //Console.WriteLine("Users:" + _users.Keys.Count);
             }
 
                     
@@ -125,7 +128,7 @@ namespace YelpAcademicSet
             
         }
 
-        private static void _handleBiz(string line)
+        private static void _handleBiz(string line, bool end)
         {
             dynamic stuff = JsonConvert.DeserializeObject(line);
             if (stuff != null)
@@ -166,250 +169,254 @@ namespace YelpAcademicSet
                 });
                 if (stuff.attributes != null)
                 {
-                    var biz = _businesses[stuff.business_id.ToString()];
-                    var atts = stuff.attributes;
-                    foreach (var att in atts)
+                    try
                     {
-                        var val = transformBool(att.Value.ToString());
-                        if (att.Name.Contains("BikeParking"))
-                            biz.BikeParking = val;
-                        else if (att.Name.Contains("BusinessAcceptsBitcoin"))
-                            biz.AcceptsBitcoin = val;
-                        else if (att.Name.Contains("BusinessAcceptsCreditCards"))
-                            biz.AcceptsCreditCards = val;
-                        else if (att.Name.Contains("DogsAllowed"))
-                            biz.DogsAllowed = val;
-                        else if (att.Name.Contains("RestaurantsPriceRange2"))
-                            biz.PriceRange = val;
-                        else if (att.Name.Contains("WheelchairAccessible"))
-                            biz.WheelchairAccessible = val;
-                        else if (att.Name.Contains("BusinessParking"))
+                        var biz = _businesses[stuff.business_id.ToString()];
+                        var atts = stuff.attributes;
+                        foreach (var att in atts)
                         {
-                            //var parking = att.Value.Split('{')[1].Split('}')[0].Split(',');
-                            foreach (var parkSpot in att.Value)
+                            var val = transformBool(att.Value.ToString());
+                            if (att.Name.Contains("BikeParking"))
+                                biz.BikeParking = val;
+                            else if (att.Name.Contains("BusinessAcceptsBitcoin"))
+                                biz.AcceptsBitcoin = val;
+                            else if (att.Name.Contains("BusinessAcceptsCreditCards"))
+                                biz.AcceptsCreditCards = val;
+                            else if (att.Name.Contains("DogsAllowed"))
+                                biz.DogsAllowed = val;
+                            else if (att.Name.Contains("RestaurantsPriceRange2"))
+                                biz.PriceRange = val;
+                            else if (att.Name.Contains("WheelchairAccessible"))
+                                biz.WheelchairAccessible = val;
+                            else if (att.Name.Contains("BusinessParking"))
                             {
-                                var parkVal = transformBool(parkSpot.Value.ToString());
-                                if (parkSpot.Name.Contains("garage"))
-                                    biz.ParkingGarage = parkVal;
-                                else if (parkSpot.Name.Contains("street"))
-                                    biz.ParkingStreet = parkVal;
-                                else if (parkSpot.Name.Contains("validated"))
-                                    biz.ParkingValidated = parkVal;
-                                else if (parkSpot.Name.Contains("lot"))
-                                    biz.ParkingLot = parkVal;
-                                else if (parkSpot.Name.Contains("valet"))
-                                    biz.ParkingValet = parkVal;
+                                //var parking = att.Value.Split('{')[1].Split('}')[0].Split(',');
+                                foreach (var parkSpot in att.Value)
+                                {
+                                    var parkVal = transformBool(parkSpot.Value.ToString());
+                                    if (parkSpot.Name.Contains("garage"))
+                                        biz.ParkingGarage = parkVal;
+                                    else if (parkSpot.Name.Contains("street"))
+                                        biz.ParkingStreet = parkVal;
+                                    else if (parkSpot.Name.Contains("validated"))
+                                        biz.ParkingValidated = parkVal;
+                                    else if (parkSpot.Name.Contains("lot"))
+                                        biz.ParkingLot = parkVal;
+                                    else if (parkSpot.Name.Contains("valet"))
+                                        biz.ParkingValet = parkVal;
+                                }
                             }
-                        }
-                        else if (att.Name.Contains("GoodForMeal"))
-                        {
-                            //var meal = att.Value.Split('{')[1].Split('}')[0].Split(',');
-                            foreach (var mealSpot in att.Value)
+                            else if (att.Name.Contains("GoodForMeal"))
                             {
-                                var mealVal = transformBool(mealSpot.Value.ToString());
-                                if (mealSpot.Name.Contains("dessert"))
-                                    biz.GoodForDessert = mealVal;
-                                else if (mealSpot.Name.Contains("latenight"))
-                                    biz.GoodForLatenight = mealVal;
-                                else if (mealSpot.Name.Contains("lunch"))
-                                    biz.GoodForLunch = mealVal;
-                                else if (mealSpot.Name.Contains("dinner"))
-                                    biz.GoodForDinner = mealVal;
-                                else if (mealSpot.Name.Contains("breakfast"))
-                                    biz.GoodForBreakfast = mealVal;
-                                else if (mealSpot.Name.Contains("brunch"))
-                                    biz.GoodForBrunch = mealVal;
+                                //var meal = att.Value.Split('{')[1].Split('}')[0].Split(',');
+                                foreach (var mealSpot in att.Value)
+                                {
+                                    var mealVal = transformBool(mealSpot.Value.ToString());
+                                    if (mealSpot.Name.Contains("dessert"))
+                                        biz.GoodForDessert = mealVal;
+                                    else if (mealSpot.Name.Contains("latenight"))
+                                        biz.GoodForLatenight = mealVal;
+                                    else if (mealSpot.Name.Contains("lunch"))
+                                        biz.GoodForLunch = mealVal;
+                                    else if (mealSpot.Name.Contains("dinner"))
+                                        biz.GoodForDinner = mealVal;
+                                    else if (mealSpot.Name.Contains("breakfast"))
+                                        biz.GoodForBreakfast = mealVal;
+                                    else if (mealSpot.Name.Contains("brunch"))
+                                        biz.GoodForBrunch = mealVal;
 
-                            }
-
-                        }
-                        else if (att.Name.Contains("Ambience"))
-                        {
-                            //var ambience = att.Value.Split('{')[1].Split('}')[0].Split(',');
-                            foreach (var ambienceSpot in att.Value)
-                            {
-                                var ambienceVal = transformBool(ambienceSpot.Value.ToString());
-                                if (ambienceSpot.Name.Contains("romantic"))
-                                    biz.AmbienceRomantic = ambienceVal;
-                                else if (ambienceSpot.Name.Contains("intimate"))
-                                    biz.AmbienceIntimate = ambienceVal;
-                                else if (ambienceSpot.Name.Contains("classy"))
-                                    biz.AmbienceClassy = ambienceVal;
-                                else if (ambienceSpot.Name.Contains("hipster"))
-                                    biz.AmbienceHipster = ambienceVal;
-                                else if (ambienceSpot.Name.Contains("divey"))
-                                    biz.AmbienceDivey = ambienceVal;
-                                else if (ambienceSpot.Name.Contains("touristy"))
-                                    biz.AmbienceTouristy = ambienceVal;
-                                else if (ambienceSpot.Name.Contains("trendy"))
-                                    biz.AmbienceTrendy = ambienceVal;
-                                else if (ambienceSpot.Name.Contains("upscale"))
-                                    biz.AmbienceUpscale = ambienceVal;
-                                else if (ambienceSpot.Name.Contains("casual"))
-                                    biz.AmbienceCasual = ambienceVal;
+                                }
 
                             }
-
-                        }
-                        else if (att.Name.Contains("HairSpecializesIn"))
-                        {
-                            //var hair = transformBool(parkSpot.Value.ToString());
-                            foreach (var HairSpot in att.Value)
+                            else if (att.Name.Contains("Ambience"))
                             {
-                                var hairVal = transformBool(HairSpot.Value.ToString());
-                                if (HairSpot.Name.Contains("coloring"))
-                                    biz.HairSpecialColor = hairVal;
-                                else if (HairSpot.Name.Contains("africanamerican"))
-                                    biz.HairSpecialAfroAmerican = hairVal;
-                                else if (HairSpot.Name.Contains("curly"))
-                                    biz.HairSpecialCurly = hairVal;
-                                else if (HairSpot.Name.Contains("perms"))
-                                    biz.HairSpecialPerms = hairVal;
-                                else if (HairSpot.Name.Contains("kids"))
-                                    biz.HairSpecialKids = hairVal;
-                                else if (HairSpot.Name.Contains("extensions"))
-                                    biz.HairSpecialExtensions = hairVal;
-                                else if (HairSpot.Name.Contains("asian"))
-                                    biz.HairSpecialAsian = hairVal;
-                                else if (HairSpot.Name.Contains("straightperms"))
-                                    biz.HairSpecialStraightPerms = hairVal;
+                                //var ambience = att.Value.Split('{')[1].Split('}')[0].Split(',');
+                                foreach (var ambienceSpot in att.Value)
+                                {
+                                    var ambienceVal = transformBool(ambienceSpot.Value.ToString());
+                                    if (ambienceSpot.Name.Contains("romantic"))
+                                        biz.AmbienceRomantic = ambienceVal;
+                                    else if (ambienceSpot.Name.Contains("intimate"))
+                                        biz.AmbienceIntimate = ambienceVal;
+                                    else if (ambienceSpot.Name.Contains("classy"))
+                                        biz.AmbienceClassy = ambienceVal;
+                                    else if (ambienceSpot.Name.Contains("hipster"))
+                                        biz.AmbienceHipster = ambienceVal;
+                                    else if (ambienceSpot.Name.Contains("divey"))
+                                        biz.AmbienceDivey = ambienceVal;
+                                    else if (ambienceSpot.Name.Contains("touristy"))
+                                        biz.AmbienceTouristy = ambienceVal;
+                                    else if (ambienceSpot.Name.Contains("trendy"))
+                                        biz.AmbienceTrendy = ambienceVal;
+                                    else if (ambienceSpot.Name.Contains("upscale"))
+                                        biz.AmbienceUpscale = ambienceVal;
+                                    else if (ambienceSpot.Name.Contains("casual"))
+                                        biz.AmbienceCasual = ambienceVal;
+
+                                }
 
                             }
-
-                        }
-                        else if (att.Name.Contains("BestNights"))
-                        {
-                            //var bestnights = att.Value.Split('{')[1].Split('}')[0].Split(',');
-                            foreach (var NightSpot in att.Value)
+                            else if (att.Name.Contains("HairSpecializesIn"))
                             {
-                                var nightVal = transformBool(NightSpot.Value.ToString());
-                                if (NightSpot.Name.Contains("monday"))
-                                    biz.BestNightMonday = nightVal;
-                                else if (NightSpot.Name.Contains("tuesday"))
-                                    biz.BestNightTuesday = nightVal;
-                                else if (NightSpot.Name.Contains("wednesday"))
-                                    biz.BestNightWednesday = nightVal;
-                                else if (NightSpot.Name.Contains("thursday"))
-                                    biz.BestNightThursday = nightVal;
-                                else if (NightSpot.Name.Contains("friday"))
-                                    biz.BestNightFriday = nightVal;
-                                else if (NightSpot.Name.Contains("saturday"))
-                                    biz.BestNightSaturday = nightVal;
-                                else if (NightSpot.Name.Contains("sunday"))
-                                    biz.BestNightSunday = nightVal;
+                                //var hair = transformBool(parkSpot.Value.ToString());
+                                foreach (var HairSpot in att.Value)
+                                {
+                                    var hairVal = transformBool(HairSpot.Value.ToString());
+                                    if (HairSpot.Name.Contains("coloring"))
+                                        biz.HairSpecialColor = hairVal;
+                                    else if (HairSpot.Name.Contains("africanamerican"))
+                                        biz.HairSpecialAfroAmerican = hairVal;
+                                    else if (HairSpot.Name.Contains("curly"))
+                                        biz.HairSpecialCurly = hairVal;
+                                    else if (HairSpot.Name.Contains("perms"))
+                                        biz.HairSpecialPerms = hairVal;
+                                    else if (HairSpot.Name.Contains("kids"))
+                                        biz.HairSpecialKids = hairVal;
+                                    else if (HairSpot.Name.Contains("extensions"))
+                                        biz.HairSpecialExtensions = hairVal;
+                                    else if (HairSpot.Name.Contains("asian"))
+                                        biz.HairSpecialAsian = hairVal;
+                                    else if (HairSpot.Name.Contains("straightperms"))
+                                        biz.HairSpecialStraightPerms = hairVal;
+
+                                }
 
                             }
-
-                        }
-                        else if (att.Name.Contains("Music"))
-                        {
-                            // var music = att.Value.Split('{')[1].Split('}')[0].Split(',');
-                            foreach (var MusicSpot in att.Value)
+                            else if (att.Name.Contains("BestNights"))
                             {
-                                var musicVal = transformBool(MusicSpot.Value.ToString());
-                                if (MusicSpot.Name.Contains("dj"))
-                                    biz.MusicDJ = musicVal;
-                                else if (MusicSpot.Name.Contains("no_music"))
-                                    biz.MusicNo = musicVal;
-                                else if (MusicSpot.Name.Contains("karaoke"))
-                                    biz.MusicKaraoke = musicVal;
-                                else if (MusicSpot.Name.Contains("live"))
-                                    biz.MusicLive = musicVal;
-                                else if (MusicSpot.Name.Contains("jukebox"))
-                                    biz.MusicJukebox = musicVal;
-                                else if (MusicSpot.Name.Contains("video"))
-                                    biz.MusicVideo = musicVal;
-                                else if (MusicSpot.Name.Contains("background_music"))
-                                    biz.MusicBackground = musicVal;
+                                //var bestnights = att.Value.Split('{')[1].Split('}')[0].Split(',');
+                                foreach (var NightSpot in att.Value)
+                                {
+                                    var nightVal = transformBool(NightSpot.Value.ToString());
+                                    if (NightSpot.Name.Contains("monday"))
+                                        biz.BestNightMonday = nightVal;
+                                    else if (NightSpot.Name.Contains("tuesday"))
+                                        biz.BestNightTuesday = nightVal;
+                                    else if (NightSpot.Name.Contains("wednesday"))
+                                        biz.BestNightWednesday = nightVal;
+                                    else if (NightSpot.Name.Contains("thursday"))
+                                        biz.BestNightThursday = nightVal;
+                                    else if (NightSpot.Name.Contains("friday"))
+                                        biz.BestNightFriday = nightVal;
+                                    else if (NightSpot.Name.Contains("saturday"))
+                                        biz.BestNightSaturday = nightVal;
+                                    else if (NightSpot.Name.Contains("sunday"))
+                                        biz.BestNightSunday = nightVal;
 
+                                }
 
                             }
-
-                        }
-                        else if (att.Name.Contains("DietaryRestrictions"))
-                        {
-                            //var diet = att.Value.Split('{')[1].Split('}')[0].Split(',');
-                            foreach (var dietSpot in att.Value)
+                            else if (att.Name.Contains("Music"))
                             {
-                                var dietVal = transformBool(dietSpot.Value.ToString());
-                                if (dietSpot.Name.Contains("dairy-free"))
-                                    biz.DietDairyFree = dietVal;
-                                else if (dietSpot.Name.Contains("gluten-free"))
-                                    biz.DietGlutenFree = dietVal;
-                                else if (dietSpot.Name.Contains("vegan"))
-                                    biz.DietVegan = dietVal;
-                                else if (dietSpot.Name.Contains("kosher"))
-                                    biz.DietKosher = dietVal;
-                                else if (dietSpot.Name.Contains("halal"))
-                                    biz.DietHalal = dietVal;
-                                else if (dietSpot.Name.Contains("soy-free"))
-                                    biz.DietSoyFree = dietVal;
-                                else if (dietSpot.Name.Contains("vegetarian"))
-                                    biz.DietVegetarian = dietVal;
+                                // var music = att.Value.Split('{')[1].Split('}')[0].Split(',');
+                                foreach (var MusicSpot in att.Value)
+                                {
+                                    var musicVal = transformBool(MusicSpot.Value.ToString());
+                                    if (MusicSpot.Name.Contains("dj"))
+                                        biz.MusicDJ = musicVal;
+                                    else if (MusicSpot.Name.Contains("no_music"))
+                                        biz.MusicNo = musicVal;
+                                    else if (MusicSpot.Name.Contains("karaoke"))
+                                        biz.MusicKaraoke = musicVal;
+                                    else if (MusicSpot.Name.Contains("live"))
+                                        biz.MusicLive = musicVal;
+                                    else if (MusicSpot.Name.Contains("jukebox"))
+                                        biz.MusicJukebox = musicVal;
+                                    else if (MusicSpot.Name.Contains("video"))
+                                        biz.MusicVideo = musicVal;
+                                    else if (MusicSpot.Name.Contains("background_music"))
+                                        biz.MusicBackground = musicVal;
 
+
+                                }
 
                             }
+                            else if (att.Name.Contains("DietaryRestrictions"))
+                            {
+                                //var diet = att.Value.Split('{')[1].Split('}')[0].Split(',');
+                                foreach (var dietSpot in att.Value)
+                                {
+                                    var dietVal = transformBool(dietSpot.Value.ToString());
+                                    if (dietSpot.Name.Contains("dairy-free"))
+                                        biz.DietDairyFree = dietVal;
+                                    else if (dietSpot.Name.Contains("gluten-free"))
+                                        biz.DietGlutenFree = dietVal;
+                                    else if (dietSpot.Name.Contains("vegan"))
+                                        biz.DietVegan = dietVal;
+                                    else if (dietSpot.Name.Contains("kosher"))
+                                        biz.DietKosher = dietVal;
+                                    else if (dietSpot.Name.Contains("halal"))
+                                        biz.DietHalal = dietVal;
+                                    else if (dietSpot.Name.Contains("soy-free"))
+                                        biz.DietSoyFree = dietVal;
+                                    else if (dietSpot.Name.Contains("vegetarian"))
+                                        biz.DietVegetarian = dietVal;
+
+
+                                }
+
+                            }
+                            else if (att.Name.Contains("GoodForKids"))
+                                biz.GoodForKids = val;
+                            else if (att.Name.Contains("RestaurantsAttire"))
+                            {
+                                biz.Attire = val;
+                            }
+                            else if (att.Name.Contains("RestaurantsDelivery"))
+                            {
+                                biz.Delivery = val;
+
+                            }
+                            else if (att.Name.Contains("RestaurantsGoodForGroups"))
+                                biz.GoodForGroups = val;
+                            else if (att.Name.Contains("RestaurantsTakeOut"))
+                                biz.TakeOut = val;
+                            else if (att.Name.Contains("RestaurantsReservations"))
+                                biz.Reservations = val;
+                            else if (att.Name.Contains("RestaurantsTableService"))
+                                biz.TableService = val;
+                            else if (att.Name.Contains("RestaurantsCounterService"))
+                                biz.CounterService = val;
+                            else if (att.Name.Contains("WiFi"))
+                                biz.WiFi = val;
+                            else if (att.Name.Contains("Alcohol"))
+                                biz.Alcohol = val;
+                            else if (att.Name.Contains("Caters"))
+                                biz.Catering = val;
+                            else if (att.Name.Contains("HasTV"))
+                                biz.HasTV = val;
+                            else if (att.Name.Contains("NoiseLevel"))
+                                biz.NoiseLevel = val;
+                            else if (att.Name.Contains("OutdoorSeating"))
+                                biz.OutdoorSeating = val;
+                            else if (att.Name.Contains("ByAppointmentOnly"))
+                                biz.ByAppointmentOnly = val;
+                            else if (att.Name.Contains("AcceptsInsurance"))
+                                biz.AcceptsInsurance = val;
+                            else if (att.Name.Contains("BYOBCorkage"))
+                                biz.BYOBCorkage = val;
+                            else if (att.Name.Contains("BYOB"))
+                                biz.BYOB = val;
+                            else if (att.Name.Contains("Corkage"))
+                                biz.Corkage = val;
+                            else if (att.Name.Contains("DriveThru"))
+                                biz.DriveThru = val;
+                            else if (att.Name.Contains("CoatCheck"))
+                                biz.CoatCheck = val;
+                            else if (att.Name.Contains("GoodForDancing"))
+                                biz.GoodForDancing = val;
+                            else if (att.Name.Contains("HappyHour"))
+                                biz.HappyHour = val;
+                            else if (att.Name.Contains("Smoking"))
+                                biz.Smoking = val;
+                            else if (att.Name.Contains("AgesAllowed"))
+                                biz.AgesAllowed = val;
+                            else if (att.Name.Contains("Open24Hours"))
+                                biz.Open24Hours = val;
 
                         }
-                        else if (att.Name.Contains("GoodForKids"))
-                            biz.GoodForKids = val;
-                        else if (att.Name.Contains("RestaurantsAttire"))
-                        {
-                            biz.Attire = val;
-                        }
-                        else if (att.Name.Contains("RestaurantsDelivery"))
-                        {
-                            biz.Delivery = val;
-
-                        }
-                        else if (att.Name.Contains("RestaurantsGoodForGroups"))
-                            biz.GoodForGroups = val;
-                        else if (att.Name.Contains("RestaurantsTakeOut"))
-                            biz.TakeOut = val;
-                        else if (att.Name.Contains("RestaurantsReservations"))
-                            biz.Reservations = val;
-                        else if (att.Name.Contains("RestaurantsTableService"))
-                            biz.TableService = val;
-                        else if (att.Name.Contains("RestaurantsCounterService"))
-                            biz.CounterService = val;
-                        else if (att.Name.Contains("WiFi"))
-                            biz.WiFi = val;
-                        else if (att.Name.Contains("Alcohol"))
-                            biz.Alcohol = val;
-                        else if (att.Name.Contains("Caters"))
-                            biz.Catering = val;
-                        else if (att.Name.Contains("HasTV"))
-                            biz.HasTV = val;
-                        else if (att.Name.Contains("NoiseLevel"))
-                            biz.NoiseLevel = val;
-                        else if (att.Name.Contains("OutdoorSeating"))
-                            biz.OutdoorSeating = val;
-                        else if (att.Name.Contains("ByAppointmentOnly"))
-                            biz.ByAppointmentOnly = val;
-                        else if (att.Name.Contains("AcceptsInsurance"))
-                            biz.AcceptsInsurance = val;
-                        else if (att.Name.Contains("BYOBCorkage"))
-                            biz.BYOBCorkage = val;
-                        else if (att.Name.Contains("BYOB"))
-                            biz.BYOB = val;
-                        else if (att.Name.Contains("Corkage"))
-                            biz.Corkage = val;
-                        else if (att.Name.Contains("DriveThru"))
-                            biz.DriveThru = val;
-                        else if (att.Name.Contains("CoatCheck"))
-                            biz.CoatCheck = val;
-                        else if (att.Name.Contains("GoodForDancing"))
-                            biz.GoodForDancing = val;
-                        else if (att.Name.Contains("HappyHour"))
-                            biz.HappyHour = val;
-                        else if (att.Name.Contains("Smoking"))
-                            biz.Smoking = val;
-                        else if (att.Name.Contains("AgesAllowed"))
-                            biz.AgesAllowed = val;
-                        else if (att.Name.Contains("Open24Hours"))
-                            biz.Open24Hours = val;
-
                     }
+                    catch (Exception) { }
                 }
                 if (stuff.categories != null)
                 {
@@ -419,6 +426,7 @@ namespace YelpAcademicSet
                     foreach (string s in stuff.categories)
                     {
                         _businesses[stuff.business_id.ToString()].CategoryList.Add(s);
+                        
                     }
                 }
                 if (stuff.hours != null)
@@ -427,39 +435,57 @@ namespace YelpAcademicSet
                     //user_max_friends = Math.Max(user_max_friends, stuff.friends.Count);
                     foreach (var s in stuff.hours)
                     {
-                        var hour = s.Value.ToString();
-                        if (s.Name.Contains("Monday"))
-                            _businesses[stuff.business_id.ToString()].HoursMonday = hour;
-                        if (s.Name.Contains("Tuesday"))
-                            _businesses[stuff.business_id.ToString()].HoursTuesday = hour;
-                        if (s.Name.Contains("Wednesday"))
-                            _businesses[stuff.business_id.ToString()].HoursWednesday = hour;
-                        if (s.Name.Contains("Thursday"))
-                            _businesses[stuff.business_id.ToString()].HoursThursday = hour;
-                        if (s.Name.Contains("Friday"))
-                            _businesses[stuff.business_id.ToString()].HoursFriday = hour;
-                        if (s.Name.Contains("Saturday"))
-                            _businesses[stuff.business_id.ToString()].HoursSaturday = hour;
-                        if (s.Name.Contains("Sunday"))
-                            _businesses[stuff.business_id.ToString()].HoursSunday = hour;
+                        try
+                        {
+                            var hour = s.Value.ToString();
+                            if (s.Name.Contains("Monday"))
+                                _businesses[stuff.business_id.ToString()].HoursMonday = hour;
+                            if (s.Name.Contains("Tuesday"))
+                                _businesses[stuff.business_id.ToString()].HoursTuesday = hour;
+                            if (s.Name.Contains("Wednesday"))
+                                _businesses[stuff.business_id.ToString()].HoursWednesday = hour;
+                            if (s.Name.Contains("Thursday"))
+                                _businesses[stuff.business_id.ToString()].HoursThursday = hour;
+                            if (s.Name.Contains("Friday"))
+                                _businesses[stuff.business_id.ToString()].HoursFriday = hour;
+                            if (s.Name.Contains("Saturday"))
+                                _businesses[stuff.business_id.ToString()].HoursSaturday = hour;
+                            if (s.Name.Contains("Sunday"))
+                                _businesses[stuff.business_id.ToString()].HoursSunday = hour;
+                        }
+                        catch(Exception) { }
                     }
                 }
-                Console.WriteLine("Businesses:" + _businesses.Keys.Count);
+                //Console.WriteLine("Businesses:" + _businesses.Keys.Count);
 
             }
         }
 
         private static int writtenReviews = 0;
         private static int numbRev = 0;
-        private static void _handleRev(string line)
+        private static void _handleRev(string line,bool end)
         {
             dynamic stuff = JsonConvert.DeserializeObject(line);
             if (stuff!=null)
             {
                 
                 if (_users.ContainsKey(stuff.user_id.ToString()) && _businesses.ContainsKey(stuff.business_id.ToString()))
+                //if (_businesses.ContainsKey(stuff.business_id.ToString()))
                 {
-                    var rev = new Review { Length = stuff.text.ToString().Length, Cool = Convert.ToInt32(stuff.cool), Funny = Convert.ToInt32(stuff.funny), Useful = Convert.ToInt32(stuff.useful), Date = stuff.date, Stars = stuff.stars, Biz = _businesses[stuff.business_id.ToString()], Id = stuff.review_id.ToString(), User = _users[stuff.user_id.ToString()] };
+                    var rev = new Review
+                    {
+                        Length = stuff.text.ToString().Length,
+                        Cool = Convert.ToInt32(stuff.cool),
+                        Funny = Convert.ToInt32(stuff.funny),
+                        Useful = Convert.ToInt32(stuff.useful),
+                        Date = stuff.date,
+                        Stars = stuff.stars,
+                        Biz = _businesses[stuff.business_id.ToString()],
+                        Id = stuff.review_id.ToString()
+                        , User = _users[stuff.user_id.ToString()] 
+                    };
+                    _reviews[stuff.review_id.ToString()] = rev;
+                    
                     _users[stuff.user_id.ToString()].Reviews.Add(rev);
                     if (rev.Biz != null)
                     {
@@ -467,6 +493,8 @@ namespace YelpAcademicSet
                         rev.Biz.Revs.Add(rev);
                     }
                     var text = stuff.text.ToString().ToLower();
+                    char[] delimiters = new char[] { ' ', '\r', '\n' };
+                    rev.Words += text.Split(delimiters, StringSplitOptions.RemoveEmptyEntries).Length;
                     //var cont_today = text.Contains("today");
                     //var cont_this_morning = text.Contains("this morning");
                     var tempCont = text.Contains("today") | text.Contains("this morning") | text.Contains("just got back") | text.Contains("tonight");
@@ -479,8 +507,8 @@ namespace YelpAcademicSet
                     if (analyzeText(real_distance_cues, text)) rev.RealDistance = 1;
                  }
                 reviewId++;
-                numbRev++;
-                Console.WriteLine("Reviews:" + numbRev);
+                //numbRev++;
+                //Console.WriteLine("Reviews:" + numbRev);
             }
             /*if (stuff.type == "tip")
             {
@@ -495,9 +523,34 @@ namespace YelpAcademicSet
             
         }
 
+        private static void _handleRevWithText(string line,bool end)
+        {
+            dynamic stuff = JsonConvert.DeserializeObject(line);
+            if (stuff != null)
+            {
+
+                if (_users.ContainsKey(stuff.user_id.ToString()) && _businesses.ContainsKey(stuff.business_id.ToString()))
+                {
+                    var rev = new Review { Length = stuff.text.ToString().Length, Cool = Convert.ToInt32(stuff.cool), Funny = Convert.ToInt32(stuff.funny), Useful = Convert.ToInt32(stuff.useful), Date = stuff.date, Stars = stuff.stars, Biz = _businesses[stuff.business_id.ToString()], Id = stuff.review_id.ToString(), User = _users[stuff.user_id.ToString()] };
+                    _reviews[stuff.review_id.ToString()] = rev;
+                    _users[stuff.user_id.ToString()].Reviews.Add(rev);
+                    if (rev.Biz != null)
+                    {
+                        if (rev.Biz.Revs == null) rev.Biz.Revs = new List<Review>();
+                        rev.Biz.Revs.Add(rev);
+                    }
+
+                    rev.Text = Regex.Replace(stuff.text.ToString().Replace("\n", "").Replace("|", ""), @"\r\n?|\n", " ");
+                }
+
+            }
 
 
-        private static void _handleRev2(string line)
+        }
+
+
+
+        private static void _handleRev2(string line, bool end)
         {
             dynamic stuff = JsonConvert.DeserializeObject(line);
             if (stuff.type == "review")
@@ -542,6 +595,8 @@ namespace YelpAcademicSet
         private static void writeAll(StreamWriter userWriter, StreamWriter businessWriter, StreamWriter reviewWriter)
         {
 
+
+            Console.WriteLine("Writing started!");
             var numbUsers = 0;
             foreach (var uId in _users.Keys)
             {
@@ -618,7 +673,8 @@ namespace YelpAcademicSet
                 var cumHome = 0;
                 var cumForeign = 0;
                 var cumReviews = 0;
-                var business_content = biz.Id + ";" + biz.City + ";" + biz.CityArea + ";" + biz.ReviewCount + ";" + biz.ZIPCode + ";" + biz.Delivery + ";" + biz.TakeOut + ";" + biz.PriceRange ; 
+                
+                var business_content = biz.Id + ";" + biz.City + ";" + biz.CityArea + ";" + biz.Latitude + ";" + biz.Longitude + ";" + biz.Stars + ";" + biz.ReviewCount + ";" + biz.Open + ";" + ";" + biz.ZIPCode + ";" + biz.Name + ";" + biz.State + ";" + biz.OrigCity + ";" + biz.Hood + ";" + biz.Address + ";" + biz.BikeParking + ";" + ";" + biz.AcceptsBitcoin + ";" + biz.AcceptsCreditCards + ";" + biz.ParkingGarage + ";" + biz.ParkingStreet + ";" + biz.ParkingValidated + ";" + biz.ParkingLot + ";" + biz.ParkingValet + ";" + biz.PriceRange + ";" + biz.WheelchairAccessible + ";" + biz.HoursMonday + ";" + biz.HoursTuesday + ";" + biz.HoursWednesday + ";" + biz.HoursThursday + ";" + biz.HoursFriday + ";" + biz.HoursSaturday + ";" + biz.HoursSunday + ";" + biz.Open24Hours;
                 for (int i = 1; i <= business_max_cats; i++)
                     if (biz.CategoryList.Count >= i)
                         business_content += ";" + biz.CategoryList[i - 1];
@@ -643,7 +699,7 @@ namespace YelpAcademicSet
                 biz.CalcualteStratifiedLag();
                 foreach (var rev in biz.Revs)
                 {
-                        var content2 = string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8}", rev.Biz.Id, rev.User.Id, rev.Stars, rev.Date, rev.Length, rev.Cool, rev.Funny, rev.Useful, rev.Id);
+                        var content2 = string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9}", rev.Biz.Id, rev.User.Id, rev.Stars, rev.Date, rev.Length, rev.Cool, rev.Funny, rev.Useful, rev.Id, rev.Words);
                     //var content2 = string.Format("{0};{1};{2};{3};{4};{5};{6};{7}", rev.Biz.Id, rev.User.Id, rev.Stars, rev.Date, rev.Length, rev.Cool, rev.Funny, rev.Useful);
                     reviewWriter.WriteLine(content2);
                     reviewWriter.Flush();
@@ -656,7 +712,129 @@ namespace YelpAcademicSet
             }
             Console.WriteLine("Written businesses and reviews.");
         }
-        
+
+        private static void writeAllSelected(StreamWriter userWriter, StreamWriter businessWriter, StreamWriter reviewWriter)
+        {
+
+
+
+            var numbUsers = 0;
+            foreach (var uId in _users.Keys)
+            {
+                Console.WriteLine("Users written:" + numbUsers++);
+                var user = _users[uId];
+                user.DetermineHometown();
+
+                if (user.ReviewsInHome < 3 || user.ReviewsInHome * 1.0 / Convert.ToDouble(user.ReviewCount) < 0.5 || !user.CheckDayDifference(360)) user.WriteUser = user.DeleteHome();
+                if (user.ReviewsInHomeArea < 3 || user.ReviewsInHomeArea * 1.0 / Convert.ToDouble(user.ReviewCount) < 0.5 || !user.CheckDayDifferenceArea(360)) user.DeleteHomeArea();
+                if (user.WriteUser)
+                {
+                    user.Reviews.Sort((x, y) => DateTime.Compare(DateTime.Parse(x.Date), DateTime.Parse(y.Date)));
+                    var cumSum = 0.0;
+                    var cumHomeArea = 0;
+                    var cumForeignArea = 0;
+                    var cumHomeAreaSum = 0.0;
+                    var cumForeignAreaSum = 0.0;
+                    var cumReviews = 0;
+
+                    var user_content = user.Id + ";" + user.Name + ";" + user.ReviewCount + ";" + user.AvgStars + ";" + user.YelpingSince + ";" + user.Fans + ";" + user.NumbYearsElite + ";" + user.NumbFriends + ";" + user.UsefulSent + ";" + user.FunnySent + ";" + user.CoolSent + ";" + user.ComplimentsHot + ";" + user.ComplimentsMore + ";" + user.ComplimentsProfile + ";" + user.ComplimentsCute + ";" + user.ComplimentsList + ";" + user.ComplimentsNote + ";" + user.ComplimentsPlain + ";" + user.ComplimentsCool + ";" + user.ComplimentsFunny + ";" + user.ComplimentsWriter + ";" + user.ComplimentsPhotos;
+                    /*    for (int i = 1; i <= user_max_elite; i++)
+                            if (user.NumbYearsElite >= i)
+                                user_content += ";" + user.YearsElite[i - 1];
+                            else user_content += ";";
+                        for (int i = 1; i <= user_max_friends; i++)
+                            if (user.NumbFriends >= i)
+                                user_content += ";" + user.Friends[i - 1]; */
+                    // userWriter.WriteLine(user_content + ";"+user.Hometown+";"+user.ReviewsInHome+";"+user.TipsInHome+";"+user.VotedOnlyInHome+";"+user.Reviews.Count+";"+user.HometownBasedOnTips+";"+user.HomeArea+";"+user.ReviewsInHomeArea);
+                    if(_selected_users.ContainsKey(user.Id))
+                        userWriter.WriteLine(user_content);
+
+                    userWriter.Flush();
+                    Review lastRev = null;
+                    foreach (var rev in user.Reviews)
+                    {
+                        if (cumReviews > 0)
+                            rev.CumulatedUserAvg = cumSum / cumReviews;
+                        else
+                            rev.CumulatedUserAvg = 0.0;
+                        if (cumHomeArea > 0)
+                            rev.CumulatedUserHomeAvg = cumHomeAreaSum / cumHomeArea;
+                        else
+                            rev.CumulatedUserHomeAvg = 0.0;
+                        if (cumHomeArea > 0)
+                            rev.CumulatedUserForeignAvg = cumForeignAreaSum / cumForeignArea;
+                        else
+                            rev.CumulatedUserForeignAvg = 0.0;
+                        rev.CumulatedUserReviewCount = cumReviews;
+                        rev.CumulatedUserHomeCount = cumHomeArea;
+                        rev.CumulatedUserForeignCount = cumForeignArea;
+
+                        cumSum += Convert.ToDouble(rev.Stars);
+                        cumHomeAreaSum = rev.IsInHomeArea * Convert.ToDouble(rev.Stars);
+                        cumHomeArea += rev.IsInHomeArea;
+                        cumForeignAreaSum = (1 - rev.IsInHomeArea) * Convert.ToDouble(rev.Stars);
+                        cumForeignArea += 1 - rev.IsInHomeArea;
+                        cumReviews++;
+
+                        if (lastRev != null && !lastRev.Biz.City.Equals(rev.Biz.City))
+                            rev.Travelled = 1;
+                        lastRev = rev;
+                    }
+                }
+            }
+            _users.Clear();
+            Console.WriteLine("Written users.");
+            int bizWritten = 0;
+            foreach (var bId in _businesses.Keys)
+            {
+                var biz = _businesses[bId];
+                biz.DetermineAggregatedValues();
+
+                biz.Revs.Sort((x, y) => DateTime.Compare(DateTime.Parse(x.Date), DateTime.Parse(y.Date)));
+                var cumSum = 0.0;
+                var cumHome = 0;
+                var cumForeign = 0;
+                var cumReviews = 0;
+                var business_content = biz.Id + ";" + biz.City + ";" + biz.CityArea + ";" + biz.ReviewCount + ";" + biz.ZIPCode + ";" + biz.Delivery + ";" + biz.TakeOut + ";" + biz.PriceRange;
+                for (int i = 1; i <= business_max_cats; i++)
+                    if (biz.CategoryList.Count >= i)
+                        business_content += ";" + biz.CategoryList[i - 1];
+                    else business_content += ";";
+                businessWriter.WriteLine(business_content);
+                businessWriter.Flush();
+
+                foreach (var rev in biz.Revs)
+                {
+                    if (cumReviews > 0)
+                        rev.CumulatedBusinessAvg = cumSum / cumReviews;
+                    else
+                        rev.CumulatedBusinessAvg = 0.0;
+                    rev.CumulatedBusinessReviewCount = cumReviews;
+
+                    cumSum += Convert.ToDouble(rev.Stars);
+                    cumHome += rev.IsInHome;
+                    cumForeign += 1 - rev.IsInHome;
+                    cumReviews++;
+                }
+                biz.CalcualteStandardDev();
+                biz.CalcualteStratifiedLag();
+                foreach (var rev in biz.Revs)
+                {
+                    var content2 = string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9}", rev.Biz.Id, rev.User.Id, rev.Stars, rev.Date, rev.Length, rev.Cool, rev.Funny, rev.Useful, rev.Id, rev.Words);
+                    //var content2 = string.Format("{0};{1};{2};{3};{4};{5};{6};{7}", rev.Biz.Id, rev.User.Id, rev.Stars, rev.Date, rev.Length, rev.Cool, rev.Funny, rev.Useful);
+                    if (_selected_users.ContainsKey(rev.User.Id))
+                        reviewWriter.WriteLine(content2);
+                    reviewWriter.Flush();
+                    writtenReviews++;
+
+                }
+
+                bizWritten++;
+                Console.WriteLine(bizWritten);
+            }
+            Console.WriteLine("Written businesses and reviews.");
+        }
+
         private static StreamWriter _revWriter;
 
         static void writeRevsWithText()
@@ -774,7 +952,7 @@ namespace YelpAcademicSet
         }
 
 
-        public static void readFile(string fileName, Action<string> handleLine)
+        public static void readFile(string fileName, Action<string,bool> handleLine)
         {
             string line;
             System.IO.StreamReader file =
@@ -785,7 +963,7 @@ namespace YelpAcademicSet
                 //{
                     
                     
-                    handleLine(line);
+                    handleLine(line,file.EndOfStream);
 
                 //}
                 //catch (JsonReaderException) { Console.WriteLine(line); }
@@ -795,7 +973,7 @@ namespace YelpAcademicSet
             file.Close();
         }
 
-        public static void readFile(string fileName, Action<string> handleLine, int c)
+        public static void readFile(string fileName, Action<string,bool> handleLine, int c)
         {
             string line;
             System.IO.StreamReader file =
@@ -807,7 +985,7 @@ namespace YelpAcademicSet
                 //{
 
 
-                handleLine(line);
+                handleLine(line,file.EndOfStream);
                 count++;
                 //}
                 //catch (JsonReaderException) { Console.WriteLine(line); }
@@ -855,25 +1033,29 @@ namespace YelpAcademicSet
         public static void basic_main()
         {
             fillCityMap();
-            readFile(@"C:\Users\Jürgen Neumann\Desktop\Yelp Round 11\dataset\business.json", _handleBiz);
-            readFile(@"C: \Users\Jürgen Neumann\Desktop\Yelp Round 11\dataset\user.json", _handleUser);
+            // readFile(@"C:\Users\Jürgen Neumann\Desktop\Yelp Round 11\dataset\business.json", _handleBiz);
+            // readFile(@"C: \Users\Jürgen Neumann\Desktop\Yelp Round 11\dataset\user.json", _handleUser);
+            readFile(@"C:\\business.json", _handleBiz);
+            readFile(@"C: \\user.json", _handleUser);
             Console.WriteLine("Users and businesses initialized");
-           // readFile("C:\\Users\\Jürgen Neumann\\Dropbox\\Master\\Masterarbeit\\Round_9\\yelp_academic_dataset_tip.json", _handleRev);
-            readFile(@"C:\Users\Jürgen Neumann\Desktop\Yelp Round 11\dataset\review.json", _handleRev);
+            // readFile("C:\\Users\\Jürgen Neumann\\Dropbox\\Master\\Masterarbeit\\Round_9\\yelp_academic_dataset_tip.json", _handleRev);
+            //readFile(@"C:\Users\Jürgen Neumann\Desktop\Yelp Round 11\dataset\review.json", _handleRev);
+            readFile(@"C:\\review.json", _handleRev);
             Console.WriteLine("Reviews and tips initiated");
 
             // Read the file and display it line by line.
 
-            var reviewWriter = new StreamWriter(@"C: \Users\Jürgen Neumann\Desktop\Yelp Round 11\dataset\reviews.csv");
-            var businessWriter = new StreamWriter(@"C:\Users\Jürgen Neumann\Desktop\Yelp Round 11\dataset\businesses.csv");
-            var userWriter = new StreamWriter(@"C:\Users\Jürgen Neumann\Desktop\Yelp Round 11\dataset\users.csv");
+            var reviewWriter = new StreamWriter(@"C: \Users\Jürgen Neumann\Desktop\reviews.csv");
+            var businessWriter = new StreamWriter(@"C:\Users\Jürgen Neumann\Desktop\businesses.csv");
+            var userWriter = new StreamWriter(@"C:\Users\Jürgen Neumann\Desktop\users.csv");
             //var aggregatedBusinessWriter = new StreamWriter("C:\\Users\\Jürgen Neumann\\Dropbox\\Master\\Masterarbeit\\Round_9\\aggregated_businesses.csv");
-            reviewWriter.WriteLine("Business;User;Review_Stars;Date;Length;Votes_Cool;Votes_Funny;Votes_Useful;Review_Id");
+            reviewWriter.WriteLine("Business;User;Review_Stars;Date;Length;Votes_Cool;Votes_Funny;Votes_Useful;Review_Id;Words");
             //reviewWriter.WriteLine("Business;User;Review_Stars;Date;Length;Votes_Cool;Votes_Funny;Votes_Useful");
             reviewWriter.Flush();
-            //var business_title = "Business;City;City_Area;Latitude;Longitude;Business_Stars;Business_Review_Count;Open;Category;ZIP_Code;Business_Name;State;OrigCity;Hood;Address;Bike_Parking;Accepts_Bitcoin;Accepts_Credit_Cards;Parking_Garage;Parking_Street;Parking_Validated;Parking_Lot;Parking_Valet;Dogs_Allowed;Price_Range;Wheelchair_Accessible;Good_For_Kids;Good_For_Dessert;Good_For_Latenight;Good_For_Lunch;Good_For_Dinner;Good_For_Breakfast;Good_For_Brunch;Attire;Delivery;Good_For_Groups;Take_Out;WiFi;Alcohol;Catering;Has_TV;Noise_Level;Outdoor_Seating;Reservations;Table_Service;Counter_Service;By_Appointment_Only;Ambience_Romantic;Ambience_Intimate;Ambience_Classy;Ambience_Hipster;Ambience_Divey;Ambience_Touristy;Ambience_Trendy;Ambience_Upscale;Ambience_Casual;Accepts_Insurance;BYOB;BYOB_Corkage;Corkage;Hours_Monday;Hours_Tuesday;Hours_Wednesday;Hours_Thursday;Hours_Friday;Hours_Saturday;Hours_Sunday;Hair_Special_Color;Hair_Special_Afro_American;Hair_Special_Curly;Hair_Special_Perms;Hair_Special_Kids;Hair_Special_Extensions;Hair_Special_Asian;Hair_Special_Straight_Perms;Drive_Thru;Best_Night_Monday;Best_Night_Tuesday;Best_Night_Wednesday;Best_Night_Thursday;Best_Night_Friday;Best_Night_Saturday;Best_Night_Sunday;Coat_Check;Good_For_Dancing;Happy_Hour;Music_DJ;Music_No;Music_Karaoke;Music_Live;Music_Jukebox;Music_Video;Music_Background;Smoking;Ages_Allowed;Diet_Dairy_Free;Diet_Gluten_Free;Diet_Vegan;Diet_Kosher;Diet_Halal;Diet_Soy_Free;Diet_Vegetarian;Open_24_Hours";
-            var business_title = "Business;City;City_Area;Business_Review_Count;ZIP_Code;Delivery;Take_Out;Price_Range";
 
+            //var business_title = "Business;City;City_Area;Latitude;Longitude;Business_Stars;Business_Review_Count;Open;ZIP_Code;Business_Name;State;OrigCity;Hood;Address;Bike_Parking;Accepts_Bitcoin;Accepts_Credit_Cards;Parking_Garage;Parking_Street;Parking_Validated;Parking_Lot;Parking_Valet;Dogs_Allowed;Price_Range;Wheelchair_Accessible;Good_For_Kids;Good_For_Dessert;Good_For_Latenight;Good_For_Lunch;Good_For_Dinner;Good_For_Breakfast;Good_For_Brunch;Attire;Delivery;Good_For_Groups;Take_Out;WiFi;Alcohol;Catering;Has_TV;Noise_Level;Outdoor_Seating;Reservations;Table_Service;Counter_Service;By_Appointment_Only;Ambience_Romantic;Ambience_Intimate;Ambience_Classy;Ambience_Hipster;Ambience_Divey;Ambience_Touristy;Ambience_Trendy;Ambience_Upscale;Ambience_Casual;Accepts_Insurance;BYOB;BYOB_Corkage;Corkage;Hours_Monday;Hours_Tuesday;Hours_Wednesday;Hours_Thursday;Hours_Friday;Hours_Saturday;Hours_Sunday;Hair_Special_Color;Hair_Special_Afro_American;Hair_Special_Curly;Hair_Special_Perms;Hair_Special_Kids;Hair_Special_Extensions;Hair_Special_Asian;Hair_Special_Straight_Perms;Drive_Thru;Best_Night_Monday;Best_Night_Tuesday;Best_Night_Wednesday;Best_Night_Thursday;Best_Night_Friday;Best_Night_Saturday;Best_Night_Sunday;Coat_Check;Good_For_Dancing;Happy_Hour;Music_DJ;Music_No;Music_Karaoke;Music_Live;Music_Jukebox;Music_Video;Music_Background;Smoking;Ages_Allowed;Diet_Dairy_Free;Diet_Gluten_Free;Diet_Vegan;Diet_Kosher;Diet_Halal;Diet_Soy_Free;Diet_Vegetarian;Open_24_Hours";
+            //var business_title = "Business;City;City_Area;Business_Review_Count;ZIP_Code;Delivery;Take_Out;Price_Range";
+            var business_title = "Business;City;City_Area;Latitude;Longitude;Business_Stars;Business_Review_Count;Open;ZIP_Code;Business_Name;State;OrigCity;Hood;Address;Bike_Parking;Accepts_Bitcoin;Accepts_Credit_Cards;Parking_Garage;Parking_Street;Parking_Validated;Parking_Lot;Parking_Valet;Price_Range;Wheelchair_Accessible;Hours_Monday;Hours_Tuesday;Hours_Wednesday;Hours_Thursday;Hours_Friday;Hours_Saturday;Hours_Sunday;Open_24_Hours";
             for (int i = 1; i <= business_max_cats; i++)
                 business_title += ";category_" + i;
             businessWriter.WriteLine(business_title);
@@ -881,6 +1063,7 @@ namespace YelpAcademicSet
             //aggregatedBusinessWriter.WriteLine("Business;City;Latitude;Longitude;Total_Reviews_Observed;Business_Review_Count;Open;Category;Reviews_Observed;Observed_Avg;Reviews_Home;Reviews_Foreign;ZIP_Code;Date;Reviews_In_Month;Avg_In_Month;Home_In_Month;Foreign_In_Month");
             //aggregatedBusinessWriter.Flush();
             //;Hometown;Reviews_In_Hometown;Tips_In_Hometown;Voted_Only_Home;Reviews_Observed;Hometown_Based_On_Tips"
+
             var user_title = "User;Name;User_Review_Count;User_Avg_Stars;Yelping_Since;Fans;Numb_Years_Elite;Numb_Friends;Useful_Sent;Funny_Sent;Cool_Sent;Compliments_Hot;Compliments_More;Compliments_Profile;Compliments_Cute;Compliments_List;Compliments_Note;Compliments_Plain;Compliments_Cool;Compliments_Funny;Compliments_Writer;Compliments_Photos";
             /*for (int i = 1; i <= user_max_elite; i++)
                 user_title += ";elite_" + i;
@@ -889,9 +1072,9 @@ namespace YelpAcademicSet
             userWriter.WriteLine(user_title + ";Hometown;Reviews_In_Hometown;Tips_In_Hometown;Voted_Only_Home;Reviews_Observed;Hometown_Based_On_Tips;Home_Area;Reviews_In_Home_Area");*/
             userWriter.WriteLine(user_title);
             userWriter.Flush();
-
-            writeAll(userWriter, businessWriter, reviewWriter);
-
+            //ATTENTION: CHECK METHOD BEFORE USING THIS
+            //writeAllSelected(userWriter, businessWriter, reviewWriter);
+            //writeAll(userWriter, businessWriter, reviewWriter);
 
             reviewWriter.Close();
             businessWriter.Close();
@@ -899,6 +1082,8 @@ namespace YelpAcademicSet
             Console.WriteLine("Written reviews:" + writtenReviews);
             Console.ReadLine();
         }
+
+
         
         public static void getTextForIds()
         {
@@ -906,7 +1091,7 @@ namespace YelpAcademicSet
 
             readFile(@"C:\Users\Jürgen Neumann\sciebo\Forschung_DG_JN\Yelp TRP\STATA Code\ISR\Construal Level Calculation\review_ids.csv", _setId);
             Console.WriteLine("Ids initiated");
-            readFile(@"C:\yelp_academic_dataset_review.json", _getRevText);
+            readFile(@"C:\yelp_academic_dataset_review.json", _getRevTextForIds);
             Console.WriteLine("Reviews initiated");
 
             
@@ -923,13 +1108,280 @@ namespace YelpAcademicSet
             Console.ReadLine();
         }
 
+
+        public static void getAllTexts()
+        {
+
+            fillCityMap();
+            readFile(@"C:\business.json", _handleBiz);
+            readFile(@"C: \user.json", _handleUser);
+            Console.WriteLine("Users and businesses initialized");
+            readFile(@"C:\review.json", _handleRev);
+            Console.WriteLine("Reviews initiated");
+
+            reviewWriter.WriteLine("text" + "|" + "id" + "|" + "user" + "|" + "revs");
+            readFile(@"C:\review.json", _getRevTextForIdsWithDirectOutput);
+            
+            
+
+
+
+
+
+
+
+
+            reviewWriter.Close();
+            Console.WriteLine("Reviews written.");
+
+            Console.ReadLine();
+        }
+
+        static StreamWriter reviewWriter = new StreamWriter(@"C:\Users\Jürgen Neumann\Desktop\review_texts.csv");
+        private static void _getRevTextForIdsWithDirectOutput(string line, bool end)
+        {
+            dynamic stuff = JsonConvert.DeserializeObject(line);
+            if (stuff != null)
+            {
+                var id = stuff.review_id.ToString();
+                if (_reviews.ContainsKey(id))
+                {
+                    var rev = _reviews[id];
+
+                    
+
+                        reviewWriter.WriteLine(Regex.Replace(stuff.text.ToString().Replace("\n", "").Replace("|", ""), @"\r\n?|\n", " ") + "|" + id + "|" + rev.User.Id);
+
+                        reviewId++;
+                        numbRev++;
+                        Console.WriteLine("Reviews:" + numbRev);
+                    
+                }
+
+            }
+
+
+        }
+
+        static StreamWriter reviewperuserWriter = new StreamWriter(@"C:\Users\Jürgen Neumann\Desktop\review_per_user_texts.csv");
+        
+        
+        private static void _getRevTextForUserWithDirectOutput(string line, bool end)
+        {
+            dynamic stuff = JsonConvert.DeserializeObject(line);
+            if (stuff != null)
+            {
+                var id = stuff.review_id.ToString();
+                if (_reviews.ContainsKey(id))
+                {
+                    var rev = _reviews[id];
+
+                    //rev.User.Texts += " " + Regex.Replace(stuff.text.ToString().Replace("\n", "").Replace("|", ""), @"\r\n?|\n", " ");
+                    rev.User.Texts = "";
+                    rev.User.currentTexts++;
+                    char[] delimiters = new char[] { ' ', '\r', '\n' };
+                    rev.User.WordCount += Regex.Replace(stuff.text.ToString().Replace("\n", "").Replace("|", ""), @"\r\n?|\n", " ").Split(delimiters, StringSplitOptions.RemoveEmptyEntries).Length;
+
+                    if (rev.User.Reviews.Count == rev.User.currentTexts)
+                    {
+                        rev.User.Texts = rev.User.Texts.Trim();
+                        
+                        reviewperuserWriter.WriteLine(rev.User.Texts + "|" + rev.User.WordCount + "|" + rev.User.Id + "|" + rev.User.Reviews.Count);
+
+                        if (rev.User.WordCount > 312 & rev.User.WordCount < 1392)
+                            _selected_users.Add(rev.User.Id, rev.User);
+
+                        _users.Remove(rev.User.Id);
+                        
+
+
+                    }
+
+                    
+                }
+
+            }
+
+
+        }
+
+
+
+
+        static Dictionary<String, User> _selected_users = new Dictionary<String, User>();
+        static Dictionary<String, User> _processed_users = new Dictionary<String, User>();
+        static Dictionary<String, User> _chunked_users = new Dictionary<String, User>();
+        static StreamWriter reviewperuserWriter2 = new StreamWriter(@"C:\Users\Jürgen Neumann\Desktop\review_per_user_texts_selected.csv");
+        private static void _getRevTextForSelectedUsers(string line, bool end)
+        {
+            dynamic stuff = JsonConvert.DeserializeObject(line);
+            if (stuff != null)
+            {
+                var id = stuff.review_id.ToString();
+                var user = stuff.user_id.ToString();
+                if (_reviews.ContainsKey(id) & _chunked_users.ContainsKey(user))
+                {
+                    //Console.WriteLine("Ist drin");
+                    Review rev = _reviews[id];
+                    
+                    rev.User.Texts += " " + Regex.Replace(stuff.text.ToString().Replace("\n", "").Replace("|", ""), @"\r\n?|\n", " ");
+                    
+                    rev.User.currentTexts++;
+                    char[] delimiters = new char[] { ' ', '\r', '\n' };
+                    rev.User.WordCount += Regex.Replace(stuff.text.ToString().Replace("\n", "").Replace("|", ""), @"\r\n?|\n", " ").Split(delimiters, StringSplitOptions.RemoveEmptyEntries).Length;
+
+                    if (rev.User.Reviews.Count == rev.User.currentTexts)
+                    {
+                        //Console.WriteLine("Ist durch");
+                        rev.User.Texts = rev.User.Texts.Trim();
+                        var arr = rev.User.Texts.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+                        int m = arr.Length / 3;
+                        int mod = arr.Length % 3;
+                        var text = "";
+                        for(int i = 0; i < arr.Length; i++)
+                        {
+                            
+                            text += arr[i] + " ";
+
+                            if (i == m)//first part
+                            {
+                                reviewperuserWriter2.WriteLine(text + "|" + rev.User.WordCount + "|" + rev.User.Id + "|" + rev.User.Reviews.Count);
+                                text = "";
+                            }
+                            if (i == 2 * m)
+                            {
+                                reviewperuserWriter2.WriteLine(text + "|" + rev.User.WordCount + "|" + rev.User.Id + "|" + rev.User.Reviews.Count);
+                                text = "";
+                            }
+
+                        }
+                        reviewperuserWriter2.WriteLine(text + "|" + rev.User.WordCount + "|" + rev.User.Id + "|" + rev.User.Reviews.Count);
+                        reviewperuserWriter2.Flush();
+
+
+                        _chunked_users.Remove(rev.User.Id);
+                        _reviews.Remove(rev.Id);
+
+
+                    }
+                    
+
+
+                }
+
+            }
+
+
+        }
+
+        public static void writeRevTextsForUsers()
+        {
+            fillCityMap();
+            readFile(@"C:\business.json", _handleBiz);
+            readFile(@"C: \user.json", _handleUser);
+            Console.WriteLine("Users and businesses initialized");
+            readFile(@"C:\review.json", _handleRev);
+            _businesses.Clear();
+            Console.WriteLine("Reviews initiated");
+            
+            reviewperuserWriter.WriteLine("texts" + "|" + "words" + "|" + "user" + "|revs");
+            reviewperuserWriter2.WriteLine("texts" + "|" + "words" + "|" + "user" + "|revs");
+
+
+
+            readFile(@"C:\review.json", _getRevTextForUserWithDirectOutput);
+           // readFile(@"C:\review.json", _getRevTextForSelectedUsers);
+            reviewperuserWriter.Close();
+            reviewperuserWriter2.Close();
+            Console.WriteLine("All dope.");
+
+            Console.ReadLine();
+        }
+
+        public static void basicForSelectedUsers()
+        {
+            fillCityMap();
+            readFile(@"C:\user_selected.csv", _setUserId);
+            basic_main();
+        }
+
+        public static void writeRevTextsForSelectedUsers()
+        {
+            fillCityMap();
+            readFile(@"C:\user_selected.csv", _setUserId);
+            readFile(@"C:\phase1.csv", _setUserProcessed);
+            /*readFile(@"C:\phase2.csv", _setUserProcessed);
+            readFile(@"C:\phase3.csv", _setUserProcessed);*/
+            
+
+            foreach(var user in _processed_users.Keys)
+                    _selected_users.Remove(user);
+            Console.WriteLine("Ids initiated");
+            readFile(@"C:\business.json", _handleBiz);
+            readFile(@"C: \user.json", _handleUser);
+            Console.WriteLine("Users and businesses initialized");
+            readFile(@"C:\review.json", _handleRev);
+            _businesses.Clear();
+            Console.WriteLine("Reviews initiated");
+
+           
+            reviewperuserWriter2.WriteLine("texts" + "|" + "words" + "|" + "user" + "|revs");
+            int i = 0;
+            while (_selected_users.Count > 0)
+            {
+                var bound = 75;
+                var already_processed = 0;
+                while (_chunked_users.Count < bound)
+                {
+                    var first = _selected_users.First();
+                    if (!_processed_users.ContainsKey(first.Key))
+                    {
+                        _chunked_users.Add(first.Key, first.Value);
+                        already_processed++;
+                        
+                    }
+                    _selected_users.Remove(first.Key);
+                }
+                readFile(@"C:\review.json", _getRevTextForSelectedUsers);
+                i++;
+                Console.WriteLine(_selected_users.Count);
+            }
+
+           
+            reviewperuserWriter2.Close();
+            Console.WriteLine("All dope.");
+
+            Console.ReadLine();
+        }
+
+
+
+
+
+        private static void _getRevText(string line)
+        {
+            dynamic stuff = JsonConvert.DeserializeObject(line);
+            if (stuff != null)
+            {
+
+                _reviews[stuff.review_id.ToString()] = new Review {Text = Regex.Replace(stuff.text.ToString().Replace("\n", "").Replace("|", ""), @"\r\n?|\n", " "), Length = stuff.text.ToString().Length, Cool = Convert.ToInt32(stuff.cool), Funny = Convert.ToInt32(stuff.funny), Useful = Convert.ToInt32(stuff.useful), Date = stuff.date, Stars = stuff.stars, BizId = stuff.business_id.ToString(), Id = stuff.review_id.ToString(), UserId = stuff.user_id.ToString() };
+                reviewId++;
+                numbRev++;
+                Console.WriteLine("Reviews:" + numbRev);
+                
+
+            }
+
+
+        }
+
         public static void determineBusiness()
         {
 
 
             readFile(@"C:\Users\Jürgen Neumann\sciebo\Forschung_DG_JN\Yelp TRP\STATA Code\ISR\Construal Level Calculation\review_ids.csv", _setId);
             Console.WriteLine("Ids initiated");
-            readFile(@"C:\yelp_academic_dataset_review.json", _getRevText);
+            readFile(@"C:\yelp_academic_dataset_review.json", _getRevTextForIds);
             Console.WriteLine("Reviews initiated");
 
 
@@ -948,7 +1400,7 @@ namespace YelpAcademicSet
             Console.ReadLine();
         }
 
-        private static void _getRevText(string line)
+        private static void _getRevTextForIds(string line, bool end)
         {
             dynamic stuff = JsonConvert.DeserializeObject(line);
             if (stuff != null)
@@ -967,10 +1419,81 @@ namespace YelpAcademicSet
         
 
         }
+        static StreamWriter restaurantReviewWriter = new StreamWriter(@"C:\Users\Jürgen Neumann\Desktop\usrestaurantreviews_true.json");
+        static Random rnd = new Random();
+        private static void _getRevForUSRestaurants(string line, bool end)
+        {
+            dynamic stuff = JsonConvert.DeserializeObject(line);
+            if (stuff != null)
+            {
+                
+                if (_reviews.ContainsKey(stuff.review_id.ToString()))
+                {
+                    
+                    var write = false;
+                    foreach(var cat in _reviews[stuff.review_id.ToString()].Biz.CategoryList)
+                    {
+                        Console.WriteLine(cat);
+                        //if (cat=="Restaurants" & rnd.Next(0,100)<=20)
+                        if (cat == "Restaurants")
+                            write = true;
+                    }
+                    if (write)
+                    {
+                        restaurantReviewWriter.WriteLine(line+",");
+                        
+                    }
+                }
 
-        private static void _setId(string line)
+            }
+
+
+        }
+
+        public static void writeJsonForUsRestaurants()
+        {
+            fillCityMap();
+            readFile(@"C:\business2.json", _handleBiz);
+            Console.WriteLine("Users and businesses initialized");
+            readFile(@"C:\review2.json", _handleRev);
+            Console.WriteLine("Reviews initiated");
+            restaurantReviewWriter.Write("[");
+            readFile(@"C:\review2.json", _getRevForUSRestaurants);
+
+
+            restaurantReviewWriter.Write("]");
+            restaurantReviewWriter.Close();
+            Console.WriteLine("All dope.");
+
+            Console.ReadLine();
+        }
+
+        private static void _setId(string line, bool end)
         {
             _reviews[line] = new Review { Id = line };
+        }
+
+        private static void _setUserId(string line, bool end)
+        {
+            _selected_users[line] = new User { Id = line };
+        }
+
+        private static void _setUserProcessed(string line, bool end)
+        {
+            try
+            {
+                _processed_users[line] = new User { Id = line };
+                //_processed_users[line.Split('|')[2]] = new User { Id = line.Split('|')[2] };
+                //Console.WriteLine(line.Split('|')[2]);
+            }
+            catch (Exception) { }
+        }
+
+        private static void _replace(string line, bool end)
+        {
+
+            restaurantReviewWriter.WriteLine(line.Replace(",]", "]"));
+          
         }
 
     }

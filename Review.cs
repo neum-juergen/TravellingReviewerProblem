@@ -12,9 +12,12 @@ namespace YelpAcademicSet
         public string Stars { get; set; }
         public Business Biz { get; set; }
         public User User { get; set; }
+        public string UserId { get; set; }
+        public string BizId { get; set; }
         public int IsInHome { get; set; }
         public int Travelled { get; set; }
         public string Text { get; set; }
+        public int Words { get; set; }
 
         public int Funny { get; set; }
         public int Useful { get; set; }

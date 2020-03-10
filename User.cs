@@ -21,6 +21,10 @@ namespace YelpAcademicSet
         public string HomeArea { get; set; }
         public int ReviewsInHomeArea { get; set; }
 
+        public int currentTexts;
+        public string Texts {get; set;}
+        public int WordCount;
+
         public string HometownBasedOnTips { get; set; }
         public int ReviewsInHome { get; set; }
         public int TipsInHome { get; set; }
@@ -48,7 +52,7 @@ namespace YelpAcademicSet
         public int ComplimentsPhotos { get; set; }
         public int NumbYearsElite { get; set; }
 
-        public User() { WriteUser = true; }
+        public User() { WriteUser = true; Texts = ""; }
         public void DetermineHometown()
         {
             var dict = new Dictionary<string, int>();
